@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <title>FETCH API</title>
+</head>
+<body>
+    <div class="container-fluid">
+        <h1 class="display-4 mb-4 jumbotron" style='font-family: cursive;'>Fetch API</h1>
+    <div class="d-flex mr-5 mt-3">
+        <button id="getText"class="ml-3 mr-4 mt-3 btn btn-primary"> Get Text </button>
+        <button id="getPlayers" class="ml-3 mr-4 mt-3 btn btn-success"> Get Players </button>    
+        <button id="getAPI" class="ml-3 mt-3 mr-4 btn btn-secondary"> Get API Data </button>    
+    </div>
+    <div id="Output"></div> 
+
+    <form class="form mt-4" id="addPost">
+        <div class="form-group">
+            <input class='form-control'type="text" id="title" placeholder="...enter post title">
+        </div>
+         <div class='form-group'>
+            <textarea class='form-control' id="body" placeholder="...enter post body"></textarea>
+        </div>
+        <button type="submit" class="btn btn-info btn-lg">Submit </button>
+    </form>
+    </div>
+    <script>
+     document.getElementById('getText').addEventListener('click', getText)
+
+     function getText(){
+         fetch('text.txt')
+         .then(res => res.text())
+         .then(data => 
+            document.getElementById('Output').innerHTML = `<h1>${data}</h1>`
+         )
+         .catch(err => console.error(error))
+     }
+
+     document.getElementById('getPlayers').addEventListener('click', getPlayers);
+
+     function getPlayers(){
+         fetch('players.json')
+         .then(res => res.json())
+         .then(data => {
+             let output = `<h2>Player's Details </h2>`
+             data.forEach(player => {
+                 output +=`
+                 <ul class= "list-group" style='font-family: cursive' >
+                    <li class="list-group-item"> ID: ${player.id}</li>
+                    <li class="list-group-item">Name: ${player.name}</li>
+                    <li class="list-group-item">Email: ${player.email}</li>
+                 </ul>
+                 `
+                 document.getElementById('Output').innerHTML = output
+
+             });
+
+         })
+     }
+
+     document.getElementById('getAPI').addEventListener('click', getAPI);
+
+     function getAPI(){
+         fetch('https://jsonplaceholder.typicode.com/posts?_limit=5')
+         .then(res => res.json())
+         .then(data => {
+             let output = `<h2 class='card card-header'>API - Get </h2>`
+             data.forEach(get => {
+                 output +=`
+                 <div class= 'card card-body'> 
+                    <h6> ${get.title}</h6>
+                    <h6>${get.body}</h6>
+                 </div>
+                 `
+                 document.getElementById('Output').innerHTML = output
+
+             });
+
+         })
+     }
+
+     document.getElementById('addPost').addEventListener('submit', addPost);
+
+     function addPost(e){
+        e.preventDefault();
+
+        let title = document.getElementById('title').value;
+        let body = document.getElementById('body').value;
+        fetch('https://jsonplaceholder.typicode.com/posts', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({title:title, body:body})
+        })
+        .then(res => res.json())
+        .then(data => console.table(data))
+        .catch(err => console.error(err))
+     }
+     </script>
+</body>
+</html>
